@@ -6,7 +6,7 @@ class Users extends \Model
 {
 	protected static $_mytable = 'users';
 	
-	public static function addUser($data = null)
+	public static function insertUser($data = null)
 	{
 		if ($data) {
 			list($insert_id, $rows_affected) = DB::insert(static::$_mytable)
@@ -15,7 +15,7 @@ class Users extends \Model
 							'username' => $data['username'],
 							'gender' => $data['gender'],
 							'auth_code' => '',
-							'created_date' => $data['created_date']
+							'created_date' => date("Y-m-d H:i:s")
 				))->execute();
 			if ($rows_affected != 0)
 				return $insert_id;

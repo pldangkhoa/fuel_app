@@ -10,7 +10,7 @@
  * @link       http://fuelphp.com
  */
 
-class Controller_Mycontroller extends Controller
+class Controller_Mycontroller extends Controller_Template
 {
 	protected $userinfo;
 	protected $val;

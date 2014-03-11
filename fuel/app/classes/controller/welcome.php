@@ -18,10 +18,14 @@ class Controller_Welcome extends Controller_Mycontroller
 
 	public function action_index()
 	{
-		$ret = Comments::getAllComments();
+		$data = Comments::getAllComments();
 		
-		var_dump($ret);
-		//return Response::forge(View::forge('welcome/index'));
+		var_dump($data);
+		
+		$this->template->title = 'mypage';
+		$this->template->content = View::forge('mypage', $data);
+		
+		
 	}
 	
 	

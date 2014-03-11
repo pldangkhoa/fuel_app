@@ -5,6 +5,8 @@ use \Model\users;
 class Controller_User extends Controller_Mycontroller
 {
 
+	public $template = 'user/layout';
+
 	public function action_index()
 	{
 		
@@ -13,9 +15,12 @@ class Controller_User extends Controller_Mycontroller
 
 	public function action_mypage()
 	{
+		$data = array();
 		$user_id = 1;
-		$ret = Users::getUserById($user_id);
-		var_dump($ret);
+		$data = Users::getUserById($user_id);
+		
+		$this->template->title = 'mypage';
+		$this->template->content = View::forge('user/mypage', $data);
 	}
 
 	public function action_user_info_edit()
