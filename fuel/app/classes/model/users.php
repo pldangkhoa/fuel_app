@@ -9,17 +9,47 @@ class Users extends \Model
 	public static function insertUser($data = null)
 	{
 		if ($data) {
+			if ($data['email']) {
+				$result = DB::select()->from(static::$_mytable)->where('email', '=', $data['email'])->execute();
+				
+				if ($result->count() > 0) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+			
 			list($insert_id, $rows_affected) = DB::insert(static::$_mytable)
 				->set(array('email' => $data['email'],
-							'password' => $data['password'],
-							'username' => $data['username'],
-							'gender' => $data['gender'],
-							'auth_code' => '',
-							'created_date' => date("Y-m-d H:i:s")
+							'password' 			=> $data['password'],
+							'username' 			=> $data['username'],
+							'gender' 			=> $data['gender'],
+							'group'           	=> 2,
+							'profile_fields'  	=> serialize(array()),
+							'last_login'      	=> 0,
+							'login_hash'      	=> '',
+							'created_at'      	=> \Date::forge()->get_timestamp(),
+							'auth_code' 		=> '',
+							'created_date' 		=> date("Y-m-d H:i:s")
 				))->execute();
 			if ($rows_affected != 0)
 				return $insert_id;
 		}
+		return false;
+	}
+	
+	public function checkValidUser($email = null)
+	{
+		if ($email) {
+			$result = DB::select()->from(static::$_mytable)->where('email', '=', $email)->execute();
+			
+			if ($result->count() > 0) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
 		return false;
 	}
 	

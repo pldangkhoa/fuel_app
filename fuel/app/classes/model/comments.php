@@ -38,7 +38,7 @@ class Comments extends \Model
 	
 	public static function getAllComments()
 	{
-		$result = DB::select()->from(static::$_mytable)->execute()->as_array();;
+		$result = DB::select()->from(static::$_mytable)->execute()->as_array();
 			
 		if ($result) {
 			foreach ($result as $key => $value) {
@@ -53,12 +53,15 @@ class Comments extends \Model
 	public static function getCommentsByOffset($limit = null, $offset = null)
 	{
 		if ($limit && $offset) {
-			$result = DB::select()->from(static::$_mytable)->limit($limit)->offset($offset)->execute();
+			$result = DB::select()->from(static::$_mytable)->order_by('created_date','desc')->limit($limit)->offset($offset)->execute()->as_array();
 		} else {
-			$result = DB::select()->from(static::$_mytable)->limit(10)->offset(0)->execute();
+			$result = DB::select()->from(static::$_mytable)->order_by('created_date','desc')->limit(5)->execute()->as_array();
 		}
 		
 		if ($result) {
+			foreach ($result as $key => $value) {
+				$result[$key]['owner'] = Users::getUserById($value['user_id']);
+			}
 			return $result;
 		} else {
 			return false;

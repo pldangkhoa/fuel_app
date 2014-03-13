@@ -7,17 +7,23 @@ class Controller_User extends Controller_Mycontroller
 
 	public $template = 'user/layout';
 
+	public function __construct()
+	{
+		if (!Auth::check()) {
+			Response::redirect('/auth/login');
+		}
+	}
+
 	public function action_index()
 	{
-		
-		var_dump("action_index");
+		Response::redirect('/user/mypage');
 	}
 
 	public function action_mypage()
 	{
 		$data = array();
-		$user_id = 1;
-		$data = Users::getUserById($user_id);
+		$user_id = Auth::get_user_id();
+		$data = Users::getUserById($user_id[1]);
 		
 		$this->template->title = 'mypage';
 		$this->template->content = View::forge('user/mypage', $data);

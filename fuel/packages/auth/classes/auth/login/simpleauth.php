@@ -129,7 +129,7 @@ class Auth_Login_Simpleauth extends \Auth_Login_Driver
 		$password = $this->hash_password($password);
 		$user = \DB::select_array(\Config::get('simpleauth.table_columns', array('*')))
 			->where_open()
-			->where('username', '=', $username_or_email)
+	//		->where('username', '=', $username_or_email)
 			->or_where('email', '=', $username_or_email)
 			->where_close()
 			->where('password', '=', $password)

@@ -12,11 +12,36 @@
 
 class Controller_Mycontroller extends Controller_Template
 {
+	protected $app_name = 'Fuel Auth App';
 	protected $userinfo;
-	protected $val;
+	protected $auth;
+	private $hasher = null;
 	
 	function __construct() {
-		
+		Auth::_init();
+	}
+	
+	/**
+	 * Default password hash method
+	 *
+	 * @param   string
+	 * @return  string
+	 */
+	public function hash_password($password)
+	{
+		return base64_encode($this->hasher()->pbkdf2($password, \Config::get('auth.salt'), \Config::get('auth.iterations', 10000), 32));
+	}
+
+	/**
+	 * Returns the hash object and creates it if necessary
+	 *
+	 * @return  PHPSecLib\Crypt_Hash
+	 */
+	public function hasher()
+	{
+		is_null($this->hasher) and $this->hasher = new \PHPSecLib\Crypt_Hash();
+
+		return $this->hasher;
 	}
 	
 }
