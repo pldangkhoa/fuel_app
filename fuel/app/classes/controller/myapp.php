@@ -73,7 +73,7 @@ class Controller_Myapp extends Controller_Mycontroller
 			$val->add_field('offset', 'Offset', 'trim|required');
 			
 			if ($val -> run()) {
-				$data['comments'] = Comments::getCommentsByOffset(2, Input::post('offset'));
+				$data['comments'] = Comments::getCommentsByOffset(5, Input::post('offset'));
 				$data['offset'] = count($data['comments']) + Input::post('offset');
 			} else {
 				//$form->validation()->error();

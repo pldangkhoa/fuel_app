@@ -55,7 +55,7 @@ class Comments extends \Model
 		if ($limit && $offset) {
 			$result = DB::select()->from(static::$_mytable)->order_by('created_date','desc')->limit($limit)->offset($offset)->execute()->as_array();
 		} else {
-			$result = DB::select()->from(static::$_mytable)->order_by('created_date','desc')->limit(5)->execute()->as_array();
+			$result = DB::select()->from(static::$_mytable)->order_by('created_date','desc')->limit(10)->execute()->as_array();
 		}
 		
 		if ($result) {

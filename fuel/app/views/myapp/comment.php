@@ -11,7 +11,22 @@
 	<form id="load-comment-form" class="form-horizontal" role="form" action="<?php echo Uri::create('myapp/loadComment', array(), array()); ?>" method="post">
 		<div class="form-group">
 			<input type="hidden" name="offset" value="<?php echo $offset;?>">
-			<button type="submit" class="col-md-offset-6 col-xs-2 btn">Read More</button>
+			<button type="submit" class="col-md-offset-6 col-xs-2 btn btn-default">Read More</button>
 		</div>
 	</form>
+	
+	<script type="text/javascript">
+		$( "#load-comment-form" ).submit(function( event ) {
+			event.preventDefault();
+			var $form = $( this ),
+				offset = $form.find( "input[name='offset']" ).val(),
+				url = $form.attr( "action" );
+			var posting = $.post( url, { offset: offset } );
+	
+			posting.done(function( data ) {
+				$( "#read-more" ).remove();
+				$( "#comments" ).append( data );
+			});
+		});
+	</script>
 </div>

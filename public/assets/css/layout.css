@@ -6,7 +6,7 @@
 	margin-top: 50px;
 	margin-bottom: 50px;
 }
-.myapp-top > .title{
+.myapp-top > .title {
 	font-size: 36px;
 	font-weight: bold;
 }
@@ -40,4 +40,42 @@
 .comment-box > span.time {
 	text-align: right;
 	padding-top: 5px;
+}
+
+.box {
+	border: 2px solid #000;
+}
+.box > .fb-box {
+	padding: 20px 0;
+	border-bottom: 2px solid #000;
+}
+.box > .login-box {
+	padding: 20px 0 5px;
+}
+
+
+/*-------------------------------------------------*/
+ul {
+	list-style: none;
+	padding: 0;
+}
+
+.btn-file {
+	position: relative;
+	overflow: hidden;
+}
+.btn-file input[type=file] {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 100%;
+	min-height: 100%;
+	font-size: 999px;
+	text-align: right;
+	filter: alpha(opacity=0);
+	opacity: 0;
+	outline: none;
+	background: white;
+	cursor: inherit;
+	display: block;
 }

@@ -53,11 +53,14 @@ class Users extends \Model
 		return false;
 	}
 	
-	public static function editUser($data = null, $user_id = null)
+	public static function editUser($user_id = null, $data = null)
 	{
-		if ($data && $uid) {
-			$query = DB::update(static::$_mytable)->set($data)->where('id', $uid)->execute();
-			return true;
+		if ($user_id && $data) {
+			try {
+				DB::update(static::$_mytable)->set($data)->where('id', $user_id)->execute();
+			} catch (Exception $e) {
+				return false;
+			}
 		}
 		return false;
 	}
@@ -68,6 +71,9 @@ class Users extends \Model
 			$result = DB::select('*')->from(static::$_mytable)->where('id', $user_id)->execute()->as_array();
 			
 			if ($result) {
+				
+		//		$hobbies = json_decode($result[0]['hobbies']);
+				
 				return $result[0];
 			}
 		}
@@ -93,7 +99,7 @@ class Users extends \Model
 	public static function checkPassword($user_id = null, $password = null)
 	{
 		if ($user_id && $password) {
-			$result = DB::select('id')->from(static::$_mytable)->where('id', $user_id)->and_where('password', md5($password))->execute();
+			$result = DB::select('id')->from(static::$_mytable)->where('id', $user_id)->and_where('password', $password)->execute();
 			
 			if ($result) {
 				return true;
@@ -103,13 +109,16 @@ class Users extends \Model
 		return false;
 	}
 	
-	public static function updatePassword($user_id = null, $password = null)
+	public static function updatePassword($user_id = null, $old_password = null, $new_password = null)
 	{
-		if ($user_id && $password) {
-			$result = DB::update(static::$_mytable)->value('password', md5($password))->where('id', '=', $user_id)->execute();
+		if ($user_id && $old_password && $new_password) {
 			
-			if ($result) {
-				return true;
+			if (Users::checkPassword($user_id, $old_password)) {
+				try {
+					return DB::update(static::$_mytable)->value('password', $new_password)->where('id', '=', $user_id)->execute();
+				} catch (Exception $e) {
+					return true;
+				}
 			}
 		}
 		
@@ -132,9 +141,9 @@ class Users extends \Model
 	public static function updateEmail($user_id = null, $email = null)
 	{
 		if ($user_id && $email) {
-			$result = DB::update(static::$_mytable)->value('email', $email)->where('id', '=', $user_id)->execute();
-			
-			if ($result) {
+			try {
+				return DB::update(static::$_mytable)->value('email', $email)->where('id', '=', $user_id)->execute();
+			} catch (Exception $e) {
 				return true;
 			}
 		}

@@ -5,8 +5,8 @@
 			<img alt="icon" width="50px" height="50px" src="/assets/img/<?php echo $user_info['icon']; ?>">
 		<?php endif; ?>
 		<span><?php echo $user_info['username']; ?></span>
-		<a href="/user/mypage"><button type="button" class="btn">mypage</button></a>
-		<button type="button" class="btn" id="logout-confirm">logout</button>
+		<a href="/user/mypage"><button type="button" class="btn btn-default">mypage</button></a>
+		<button type="button" class="btn btn-default" id="logout-confirm">logout</button>
 	</div>
 </div>
 <div id="confirm-box" style="display: none;">Logout?</div>
@@ -35,13 +35,28 @@
 		<form id="load-comment-form" class="form-horizontal" role="form" action="<?php echo Uri::create('myapp/loadComment', array(), array()); ?>" method="post">
 			<div class="form-group">
 				<input type="hidden" name="offset" value="<?php echo $offset;?>">
-				<button type="submit" class="col-md-offset-6 col-xs-2 btn">Read More</button>
+				<button type="submit" class="col-md-offset-6 col-xs-2 btn btn-default">Read More</button>
 			</div>
 		</form>
+		
+		<script type="text/javascript">
+			$( "#load-comment-form" ).submit(function( event ) {
+				event.preventDefault();
+				var $form = $( this ),
+					offset = $form.find( "input[name='offset']" ).val(),
+					url = $form.attr( "action" );
+				var posting = $.post( url, { offset: offset } );
+		
+				posting.done(function( data ) {
+					$( "#read-more" ).remove();
+					$( "#comments" ).append( data );
+				});
+			});
+		</script>
 	</div>
 </div>
 
-<script>
+<script type="text/javascript">
 $( "#add-comment-form" ).submit(function( event ) {
 	event.preventDefault();
 	var $form = $( this ),
@@ -54,20 +69,6 @@ $( "#add-comment-form" ).submit(function( event ) {
 		$( "#comments" ).empty().html( data );
 	});
 });
-
-$( "#load-comment-form" ).submit(function( event ) {
-	event.preventDefault();
-	var $form = $( this ),
-		offset = $form.find( "input[name='offset']" ).val(),
-		url = $form.attr( "action" );
-	var posting = $.post( url, { offset: offset } );
-
-	posting.done(function( data ) {
-		$( "#read-more" ).remove();
-		$( "#comments" ).append( data );
-	});
-});
-
 
 $( "#logout-confirm" ).click(function() {
 	$( "#confirm-box" ).dialog({
@@ -85,6 +86,4 @@ $( "#logout-confirm" ).click(function() {
 		}
 	});
 });
-
-
 </script>

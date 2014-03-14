@@ -12,6 +12,9 @@ class Controller_Auth extends Controller_Mycontroller
 
 	public function action_login()
 	{
+		$data = array();
+		$data['app_name'] = $this->app_name;
+		
 		if (Auth::check()) {
 			Response::redirect('/');
 		}
@@ -38,7 +41,7 @@ class Controller_Auth extends Controller_Mycontroller
 		}
 		
 		$this->template->title = 'login';
-		$this->template->content = View::forge('auth/login');
+		$this->template->content = View::forge('auth/login', $data);
 	}
 
 	public function action_logout()
@@ -51,6 +54,7 @@ class Controller_Auth extends Controller_Mycontroller
 	public function action_signup()
 	{
 		$data = array();
+		$data['app_name'] = $this->app_name;
 		
 		$val = Validation::forge();
 		$val->add_field('username', 'User name', 'trim|required|min_length[6]');
@@ -82,30 +86,41 @@ class Controller_Auth extends Controller_Mycontroller
 
 	public function action_thank_you_signup()
 	{
-		
-		
-		var_dump("action_thank_you_signup");
+		$this->template->title = 'thank_you_signup';
+		$this->template->content = View::forge('auth/thank_you_signup');
 	}
 
 	public function action_activation_complete()
 	{
-		
-		
-		var_dump("action_activation_complete");
+		$this->template->title = 'activation_complete';
+		$this->template->content = View::forge('auth/activation_complete');
 	}
 
 	public function action_forget_password()
 	{
+		//check email
 		
+		//ok -> send mail
 		
-		var_dump("action_forget_password");
+		//else -> show error
+		
+		$this->template->title = 'forget password';
+		$this->template->content = View::forge('auth/forget_password');
 	}
 
 	public function action_new_password()
 	{
+		//check code
+		
+		//ok -> show form
+		
+		// else -> show error code
+		
+		//update new password
 		
 		
-		var_dump("action_new_password");
+		$this->template->title = 'new password';
+		$this->template->content = View::forge('auth/new_password');
 	}
 	
 }

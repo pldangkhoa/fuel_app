@@ -44,4 +44,21 @@ class Controller_Mycontroller extends Controller_Template
 		return $this->hasher;
 	}
 	
+	public function sendmail($from, $to, $subject, $body)
+	{
+		$email = Email::forge();
+		$email->from($from);
+		$email->to($to);
+		$email->subject($subject);
+		$email->body($body);
+		
+		try {
+			$email->send();
+		} catch(\EmailValidationFailedException $e) {
+		    return false;
+		}
+		
+		return true;
+	}
+	
 }
