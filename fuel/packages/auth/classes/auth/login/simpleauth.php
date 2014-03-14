@@ -85,7 +85,8 @@ class Auth_Login_Simpleauth extends \Auth_Login_Driver
 			if (is_null($this->user) or ($this->user['username'] != $username and $this->user != static::$guest_login))
 			{
 				$this->user = \DB::select_array(\Config::get('simpleauth.table_columns', array('*')))
-					->where('username', '=', $username)
+	//				->where('username', '=', $username)
+					->where('email', '=', $username)
 					->from(\Config::get('simpleauth.table_name'))
 					->execute(\Config::get('simpleauth.db_connection'))->current();
 			}
@@ -130,9 +131,11 @@ class Auth_Login_Simpleauth extends \Auth_Login_Driver
 		$user = \DB::select_array(\Config::get('simpleauth.table_columns', array('*')))
 			->where_open()
 	//		->where('username', '=', $username_or_email)
-			->or_where('email', '=', $username_or_email)
+	//		->or_where('email', '=', $username_or_email)
+			->where('email', '=', $username_or_email) // added
 			->where_close()
 			->where('password', '=', $password)
+			->where('actived', '=', 1) // added
 			->from(\Config::get('simpleauth.table_name'))
 			->execute(\Config::get('simpleauth.db_connection'))->current();
 
@@ -159,7 +162,7 @@ class Auth_Login_Simpleauth extends \Auth_Login_Driver
 		// register so Auth::logout() can find us
 		Auth::_register_verified($this);
 
-		\Session::set('username', $this->user['username']);
+		\Session::set('username', $this->user['email']);
 		\Session::set('login_hash', $this->create_login_hash());
 		\Session::instance()->rotate();
 		return true;
@@ -455,11 +458,13 @@ class Auth_Login_Simpleauth extends \Auth_Login_Driver
 		}
 
 		$last_login = \Date::forge()->get_timestamp();
-		$login_hash = sha1(\Config::get('simpleauth.login_hash_salt').$this->user['username'].$last_login);
+	//	$login_hash = sha1(\Config::get('simpleauth.login_hash_salt').$this->user['username'].$last_login);
+		$login_hash = sha1(\Config::get('simpleauth.login_hash_salt').$this->user['email'].$last_login);
 
 		\DB::update(\Config::get('simpleauth.table_name'))
 			->set(array('last_login' => $last_login, 'login_hash' => $login_hash))
-			->where('username', '=', $this->user['username'])
+	//		->where('username', '=', $this->user['username'])
+			->where('email', '=', $this->user['email'])
 			->execute(\Config::get('simpleauth.db_connection'));
 
 		$this->user['login_hash'] = $login_hash;

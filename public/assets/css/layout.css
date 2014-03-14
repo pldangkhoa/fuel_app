@@ -45,6 +45,12 @@
 .box {
 	border: 2px solid #000;
 }
+.box > legend {
+	padding: 0 10px;
+	margin: 0;
+	width: auto;
+	border: none;
+}
 .box > .fb-box {
 	padding: 20px 0;
 	border-bottom: 2px solid #000;
@@ -52,12 +58,61 @@
 .box > .login-box {
 	padding: 20px 0 5px;
 }
+.error {
+	color: red;
+}
+
+.icon {
+	display: block;
+	width: 160px;
+	
+}
+.icon > img {
+	width: 160px;
+	height: 160px;
+}
+.icon > span {
+	display: block;
+	text-align: center;
+	font-weight: bold;
+	font-size: 20px;
+	padding-top: 5px;
+}
+
+.menu {
+	margin-top: 50px;
+	width: 160px;
+}
+.menu > ul {
+	border: 2px solid #000;
+	padding-bottom: 50px;
+}
+.menu > ul > li {
+	padding: 5px 0 0 10px;
+	cursor: pointer;
+}
+.menu > ul > li:hover,
+.menu > ul > li.active {
+	background: #3F8BFF;
+}
+.menu > ul > li > a {
+	display: block;
+	color: #000;
+	font-weight: bold;
+}
+.menu > ul > li > a:hover {
+	text-decoration: none;
+}
 
 
 /*-------------------------------------------------*/
 ul {
 	list-style: none;
 	padding: 0;
+}
+
+.ui-dialog-titlebar {
+	display: none;
 }
 
 .btn-file {
@@ -79,3 +134,5 @@ ul {
 	cursor: inherit;
 	display: block;
 }
+
+

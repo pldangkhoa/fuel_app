@@ -6,19 +6,22 @@
 </div>
 <div class="row">
 	<div class="col-sm-offset-2 col-xs-8">
+		<?php if (empty($error['auth_code'])) : ?>
 		<div class="row">
 			<div class="col-xs-12">
-				<form class="form-horizontal" role="form" action="<?php echo Uri::create('auth/new_password', array(), array()); ?>" method="post">
+				<form class="form-horizontal" role="form" action="<?php echo Uri::create('auth/new_password/'.$auth_code, array(), array()); ?>" method="post">
 					<div class="form-group">
-						<label for="inputPassword" class="col-xs-4 control-label">password: </label>
+						<label for="inputNewPassword" class="col-xs-4 control-label">password: </label>
 						<div class="col-xs-7">
-							<input type="password" name="password" class="form-control" id="inputPassword" placeholder="new password">
+							<input type="password" name="new_password" class="form-control" id="inputNewPassword" placeholder="new password">
+							<span class="error"><?php echo !empty($error['new_password']) ? $error['new_password'] : ''; ?></span>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="inputConfirmPassword" class="col-xs-4 control-label">confirm password: </label>
+						<label for="inputConfirmNewPassword" class="col-xs-4 control-label">confirm password: </label>
 						<div class="col-xs-7">
-							<input type="password" name="confirm_password" class="form-control" id="inputConfirmPassword" placeholder="confirm password">
+							<input type="password" name="confirm_new_password" class="form-control" id="inputConfirmNewPassword" placeholder="confirm new password">
+							<span class="error"><?php echo !empty($error['confirm_new_password']) ? $error['confirm_new_password'] : ''; ?></span>
 						</div>
 					</div>
 					<div class="form-group">
@@ -29,5 +32,8 @@
 				</form>
 			</div>
 		</div>
+		<?php else : ?>
+		<p class="error"><?php echo $error['auth_code']; ?></p>
+		<?php endif; ?>
 	</div>	
 </div>

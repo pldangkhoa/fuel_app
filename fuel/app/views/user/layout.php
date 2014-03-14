@@ -15,24 +15,26 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-xs-4">
-				<div>
-					<img alt="icon" width="100px" height="100px" src="/files/<?php echo $user_info['icon']; ?>">
-					<span><?php echo $user_info['username']; ?></span>
+			<div class="col-xs-3">
+				<div class="icon">
+					<?php if (!empty($data['user_info']['icon']) && !empty($data['user_info']['view_icon'])) : ?>
+					<img alt="icon" src="/files/<?php echo $data['user_info']['icon']; ?>">
+					<?php endif; ?>
+					<span><?php echo $data['user_info']['username']; ?></span>
 				</div>
 				
 				<div class="menu">
 					<span>menu</span>
 					<ul>
-						<li><a href="/user/mypage">user_info</a></li>
-						<li><a href="/user/user_info_edit">user_edit_info</a></li>
-						<li><a href="/user/email_edit">email_edit</a></li>
-						<li><a href="/user/password_edit">password_edit</a></li>
-						<li><a href="/user/signout">signout</a></li>
+						<li class="<?php echo $data['action'] == 'mypage' ? 'active' : ''; ?>"><a href="/user/mypage">user_info</a></li>
+						<li class="<?php echo $data['action'] == 'user_info_edit' ? 'active' : ''; ?>"><a href="/user/user_info_edit">user_edit_info</a></li>
+						<li class="<?php echo $data['action'] == 'email_edit' ? 'active' : ''; ?>"><a href="/user/email_edit">email_edit</a></li>
+						<li class="<?php echo $data['action'] == 'password_edit' ? 'active' : ''; ?>"><a href="/user/password_edit">password_edit</a></li>
+						<li class="<?php echo $data['action'] == 'signout' ? 'active' : ''; ?>"><a href="/user/signout">signout</a></li>
 					</ul>
 				</div>
 			</div>
-			<div class="col-xs-8">
+			<div class="col-xs-9">
 				<?php echo $content; ?>
 			</div>
 		</div>

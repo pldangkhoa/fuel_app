@@ -1,6 +1,7 @@
 <?php
 
 use \Model\users;
+use \Model\hobbies;
 
 class Controller_User extends Controller_Mycontroller
 {
@@ -8,12 +9,15 @@ class Controller_User extends Controller_Mycontroller
 	public $template = 'user/layout';
 	protected $user_id;
 	protected $user_info = array();
+	protected $segments = array();
 
 	public function __construct()
 	{
 		if (!Auth::check()) {
 			Response::redirect('/auth/login');
 		}
+		
+		$this->segments = Uri::segments();
 		
 		$auth_id = Auth::get_user_id();
 		$this->user_id = $auth_id[1];
@@ -27,14 +31,32 @@ class Controller_User extends Controller_Mycontroller
 
 	public function action_mypage()
 	{
+		$data = array();
+		$data['controller'] = $this->segments[0];
+		$data['action'] = $this->segments[1];
+		
+		$hobby_ids = json_decode($this->user_info['hobbies']);
+		$hobbies = Hobbies::getHobbiesByIds($hobby_ids);
+	//	$hobbies = implode(', ', $hobbies);
+		
+	//	$hobbies = explode(',', $string)
+		
+	//	var_dump($hobby_ids);
+		
+		
+		$data['user_info'] = $this->user_info;
+		
 		$this->template->title = 'mypage';
-		$this->template->user_info = $this->user_info;
+		$this->template->data = $data;
 		$this->template->content = View::forge('user/mypage', $this->user_info);
 	}
 
 	public function action_user_info_edit()
 	{
 		$data = array();
+		$data['controller'] = $this->segments[0];
+		$data['action'] = $this->segments[1];
+		$data['user_info'] = $this->user_info;
 		
 		if (Input::method() == 'POST') {
 			$val = Validation::forge();
@@ -96,13 +118,18 @@ class Controller_User extends Controller_Mycontroller
 		$data['user_info'] = $this->user_info;
 		
 		$this->template->title = 'user_info_edit';
-		$this->template->user_info = $this->user_info;
+		$this->template->data = $data;
 		$this->template->content = View::forge('user/user_info_edit', $data);
 	}
 	
 	
 	public function action_signout()
 	{	
+		$data = array();
+		$data['controller'] = $this->segments[0];
+		$data['action'] = $this->segments[1];
+		$data['user_info'] = $this->user_info;
+		
 		if (Input::method() == 'POST') {
 			if (Input::post('signout') == 1) {
 				Auth::dont_remember_me();
@@ -112,56 +139,68 @@ class Controller_User extends Controller_Mycontroller
 				$from = 'khoa@gmail.com';
 				$to = $this->user_info['email'];
 				$subject = 'Fuel app - Signout';
-				$body = 'You have been signout!!!';
-				$this->sendmail($from, $to, $subject, $body);
+				$body = $data['user_info'];
+				$this->sendmail($from, $to, $subject, $body, $view = 'signout');
 				
 				Response::redirect('/auth/login');
 			}
 		}
 		
 		$this->template->title = 'signout';
-		$this->template->user_info = $this->user_info;
+		$this->template->data = $data;
 		$this->template->content = View::forge('user/signout');
 	}
 
 	public function action_email_edit()
 	{
 		$data = array();
+		$data['controller'] = $this->segments[0];
+		$data['action'] = $this->segments[1];
+		$data['user_info'] = $this->user_info;
 		$data['success'] = false;
-		
-		$this->template->title = 'email edit';
-		$this->template->user_info = $this->user_info;
-		
 		
 		if (Input::method() == 'POST') {
 			$val = Validation::forge();
-			$val->add_field('new_email', 'New Email', 'trim|required|min_length[6]');
+			$val->add_field('new_email', 'New Email', 'trim|required|valid_email');
 			$val->add_field('confirm_new_email', 'Confirm New Email', 'trim|match_field[new_email]');
 			
 			if ($val -> run()) {
-				$new_email =(string) trim(Input::post('new_email'));
+				$new_email = (string) trim($val->validated('new_email'));
 				
-				if (Users::updateEmail($this->user_id, $new_email)) {
-					$data['success'] = true;
-					
-					// send mail
-					
+				$user = Users::find_one_by('email', $new_email);
+				if ($user) {
+					$data['error']['new_email'] = 'Your email is used.';
 				} else {
-					//$error = 101;
-				}
+					if (Users::updateEmail($this->user_id, $new_email)) {
+						// send mail
+						$from = 'khoa@gmail.com';
+						$to = $new_email;
+						$subject = 'Fuel app - Email edit';
+						$body = $data['user_info'];
+						$this->sendmail($from, $to, $subject, $body, $view = 'email_edit');
+						
+						$data['success'] = 'Your email has been changed.';
+					} else {
+						$data['error']['success'] = 'Update email error.';
+					}
+				}	
 					
 			} else {
-				//$form->validation()->error();
-				//$this->template->error = 101;
+				$data['error'] = $val->error_message();
 			}	
 		}
 		
+		$this->template->title = 'email edit';
+		$this->template->data = $data;
 		$this->template->content = View::forge('user/email_edit', $data);
 	}
 
 	public function action_password_edit()
 	{
 		$data = array();
+		$data['controller'] = $this->segments[0];
+		$data['action'] = $this->segments[1];
+		$data['user_info'] = $this->user_info;
 		$data['success'] = false;
 		
 		if (Input::method() == 'POST') {
@@ -171,32 +210,35 @@ class Controller_User extends Controller_Mycontroller
 			$val->add_field('confirm_new_password', 'Confirm New Password', 'trim|match_field[new_password]');
 			
 			if ($val->run()) {
-				$fields = $val->validated();
+				$old_password = $this->hash_password(trim($val->validated('old_password')));
+				$new_password = $this->hash_password(trim($val->validated('new_password')));
 				
-				$old_password = $this->hash_password($fields['old_password']);
-				$new_password = $this->hash_password($fields['new_password']);
-				
-				if (Users::updatePassword($this->user_id, $old_password, $new_password)) {
-					$data['success'] = true;
+				$users = Users::find_by(array('id' => $this->user_id, 'password' => $old_password));
+				if ($users) {
+					foreach ($users as $user) {
+						$user->password = $new_password;
+						$user->save();
+						
+						$data['success'] = 'Your password has been changed.';
+					}
 					
 					// send mail
+					$from = 'khoa@gmail.com';
+					$to = $this->user_info['email'];
+					$subject = 'Fuel app - Password edit';
+					$body = $data['user_info'];
+					$this->sendmail($from, $to, $subject, $body, $view = 'password_edit');
 					
 				} else {
-					$error = 101;
-				}
-					
+					$data['error']['old_password'] = 'Your old password is not correct.';
+				}	
 			} else {
-				$error = array();
-				$errors = $val->error();
-				foreach ($errors as $k => $v) {
-					$error[$k]['rule'] = $v->field;
-				}
-			var_dump($val->error('old_password')->get_message());
+				$data['error'] = $val->error_message();
 			}	
 		}
 		
 		$this->template->title = 'password edit';
-		$this->template->user_info = $this->user_info;
+		$this->template->data = $data;
 		$this->template->content = View::forge('user/password_edit', $data);
 	}
 	

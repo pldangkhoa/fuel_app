@@ -3,7 +3,7 @@ namespace Model;
 use \DB;
 use \Model\users;
 
-class Comments extends \Model
+class Hobbies extends \Model
 {
 	protected static $_mytable = 'hobbies';
 	
@@ -34,9 +34,13 @@ class Comments extends \Model
 	public static function getHobbiesByIds($ids = array())
 	{
 		if ($ids && is_array($ids)) {
-			try {
-				return DB::select('name')->from(static::$_mytable)->where('id', 'in', $ids)->order_by('order','asc')->execute()->as_array();
-			} catch (Exception $e) {
+			$result = DB::select('name')->from(static::$_mytable)->where('id', 'in', $ids)->order_by('order','asc')->execute()->as_array();
+			if ($result) {
+				foreach ($result as $key => $value) {
+					$result[$key] = $value['name'];
+				}
+				return $result;
+			} else {
 				return false;
 			}
 		}

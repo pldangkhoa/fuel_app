@@ -13,8 +13,6 @@
 class Controller_Mycontroller extends Controller_Template
 {
 	protected $app_name = 'Fuel Auth App';
-	protected $userinfo;
-	protected $auth;
 	private $hasher = null;
 	
 	function __construct() {
@@ -44,13 +42,26 @@ class Controller_Mycontroller extends Controller_Template
 		return $this->hasher;
 	}
 	
-	public function sendmail($from, $to, $subject, $body)
+	public function genCode($code = null) {
+		if ($code) {
+			return md5($code . \Config::get('auth.salt') . uniqid() . time());
+		} else {
+			return md5(\Config::get('auth.salt') . uniqid() . time());
+		}
+	}
+	
+	public function sendmail($from, $to, $subject, $body, $view = null)
 	{
 		$email = Email::forge();
 		$email->from($from);
 		$email->to($to);
 		$email->subject($subject);
-		$email->body($body);
+		
+		if ($view) {
+			$email->html_body(\View::forge('email/'.$view, $body));
+		} else {
+			$email->html_body(\View::forge('email/template', $body));
+		}
 		
 		try {
 			$email->send();
@@ -60,5 +71,4 @@ class Controller_Mycontroller extends Controller_Template
 		
 		return true;
 	}
-	
 }

@@ -1,4 +1,4 @@
-<?php if (isset($success) && $success === true) : ?>
+<?php if (!empty($success)) : ?>
 	<p>Your password has been updated successfully !!!</p>
 <?php else : ?>
 <div class="row">
@@ -8,6 +8,7 @@
 				<label for="inputOldPassword" class="col-xs-4 control-label">old password: </label>
 				<div class="col-xs-7">
 					<input type="password" name="old_password" class="form-control" id="inputOldPassword" placeholder="old password">
+					<span class="error"><?php echo !empty($error['old_password']) ? $error['old_password'] : ''; ?></span>
 				</div>
 			</div>
 			<hr>
@@ -15,12 +16,14 @@
 				<label for="inputNewPassword" class="col-xs-4 control-label">new password: </label>
 				<div class="col-xs-7">
 					<input type="password" name="new_password" class="form-control" id="inputNewPassword" placeholder="password">
+					<span class="error"><?php echo !empty($error['new_password']) ? $error['new_password'] : ''; ?></span>
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="inputConfirmNewPassword" class="col-xs-4 control-label">confirm password: </label>
 				<div class="col-xs-7">
 					<input type="password" name="confirm_new_password" class="form-control" id="inputConfirmNewPassword" placeholder="confirm new password">
+					<span class="error"><?php echo !empty($error['confirm_new_password']) ? $error['confirm_new_password'] : ''; ?></span>
 				</div>
 			</div>
 			<div class="form-group">

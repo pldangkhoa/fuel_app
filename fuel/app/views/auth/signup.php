@@ -5,35 +5,45 @@
 	</div>
 </div>
 <div class="row">
-	<div class="col-sm-offset-2 col-xs-8 box">
+	<fieldset class="col-sm-offset-2 col-xs-8 box">
+		<legend>sign up</legend>
 		<div class="row fb-box">
 			<div class="col-sm-offset-1 col-xs-10"><button class="btn btn-primary col-xs-12">Facebook on Signup</button></div>
 		</div>
 		<div class="row login-box">
 			<div class="col-xs-12">
 				<form class="form-horizontal" role="form" action="<?php echo Uri::create('auth/signup', array(), array()); ?>" method="post">
+					<?php if (!empty($error['signup_fail'])) : ?>
+						<div class="form-group">
+							<span class="error col-sm-offset-4"><?php echo $error['signup_fail']; ?></span>
+						</div>
+					<?php endif; ?>
 					<div class="form-group">
 						<label for="inputUsername" class="col-xs-4 control-label">username: </label>
 						<div class="col-xs-7">
 							<input type="text" name="username" class="form-control" id="inputUsername" placeholder="username">
+							<span class="error"><?php echo !empty($error['username']) ? $error['username'] : ''; ?></span>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="inputEmail" class="col-xs-4 control-label">Email: </label>
 						<div class="col-xs-7">
 							<input type="email" name="email" class="form-control" id="inputEmail" placeholder="your email">
+							<span class="error"><?php echo !empty($error['email']) ? $error['email'] : ''; ?></span>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="inputPassword" class="col-xs-4 control-label">password: </label>
 						<div class="col-xs-7">
 							<input type="password" name="password" class="form-control" id="inputPassword" placeholder="password">
+							<span class="error"><?php echo !empty($error['password']) ? $error['password'] : ''; ?></span>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="inputConfirmPassword" class="col-xs-4 control-label">confirm password: </label>
 						<div class="col-xs-7">
 							<input type="password" name="confirm_password" class="form-control" id="inputConfirmPassword" placeholder="confirm password">
+							<span class="error"><?php echo !empty($error['confirm_password']) ? $error['confirm_password'] : ''; ?></span>
 						</div>
 					</div>
 					<div class="form-group">
@@ -64,5 +74,5 @@
 				</form>
 			</div>
 		</div>
-	</div>
+	</fieldset>
 </div>
