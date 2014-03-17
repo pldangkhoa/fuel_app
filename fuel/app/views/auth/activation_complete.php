@@ -1,5 +1,5 @@
 <div class="row myapp-top">
-	<div class="col-xs-6 title"><?php echo !empty($error) ? $error: 'Activation is completed!'; ?></div>
+	<div class="col-xs-6 title"><?php echo !empty($error) ? $error : 'Activation is completed!'; ?></div>
 </div>
 <div class="row">
 	<div class="col-sm-offset-2 col-xs-8">

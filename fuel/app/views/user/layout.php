@@ -17,7 +17,7 @@
 		<div class="row">
 			<div class="col-xs-3">
 				<div class="icon">
-					<?php if (!empty($data['user_info']['icon']) && !empty($data['user_info']['view_icon'])) : ?>
+					<?php if (!empty($data['user_info']['icon'])) : ?>
 					<img alt="icon" src="/files/<?php echo $data['user_info']['icon']; ?>">
 					<?php endif; ?>
 					<span><?php echo $data['user_info']['username']; ?></span>

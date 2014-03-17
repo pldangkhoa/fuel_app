@@ -8,7 +8,11 @@
 	<fieldset class="col-sm-offset-2 col-xs-8 box">
 		<legend>login</legend>
 		<div class="row fb-box">
-			<div class="col-sm-offset-1 col-xs-10"><button class="btn btn-primary col-xs-12">Facebook Login</button></div>
+			<div class="col-sm-offset-1 col-xs-10">
+				<a href="<?php echo !empty($loginUrl) ? $loginUrl : ''; ?>">
+					<button class="btn btn-primary col-xs-12"><?php ?>Facebook Login</button>
+				</a>
+			</div>
 		</div>
 		<div class="row login-box">
 			<div class="col-xs-12">

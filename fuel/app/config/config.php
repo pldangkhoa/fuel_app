@@ -24,7 +24,7 @@ return array(
 	 *
 	 * Set this to null to have it automatically detected.
 	 */
-	// 'base_url'  => null,
+	 'base_url'  => null,
 
 	/**
 	 * url_suffix - Any suffix that needs to be added to
@@ -49,13 +49,13 @@ return array(
 	/**
 	 * Default location for the file cache
 	 */
-	// 'cache_dir'       => APPPATH.'cache/',
+	 'cache_dir'       => APPPATH.'cache/',
 
 	/**
 	 * Settings for the file finder cache (the Cache class has it's own config!)
 	 */
-	// 'caching'         => false,
-	// 'cache_lifetime'  => 3600, // In Seconds
+	 'caching'         => false,
+	 'cache_lifetime'  => 3600, // In Seconds
 
 	/**
 	 * Callback to use with ob_start(), set this to 'ob_gzhandler' for gzip encoding of output
@@ -85,7 +85,7 @@ return array(
 	/**
 	 * Internal string encoding charset
 	 */
-	// 'encoding'  => 'UTF-8',
+	 'encoding'  => 'UTF-8',
 
 	/**
 	 * DateTime settings
@@ -106,9 +106,9 @@ return array(
 	 * Fuel::L_INFO
 	 * Fuel::L_ALL
 	 */
-	// 'log_threshold'    => Fuel::L_WARNING,
-	// 'log_path'         => APPPATH.'logs/',
-	// 'log_date_format'  => 'Y-m-d H:i:s',
+	 'log_threshold'    => Fuel::L_WARNING,
+	 'log_path'         => APPPATH.'logs/',
+	 'log_date_format'  => 'Y-m-d H:i:s',
 
 	/**
 	 * Security settings

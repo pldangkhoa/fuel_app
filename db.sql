@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Mar 14, 2014 at 10:14 AM
+-- Generation Time: Mar 17, 2014 at 01:11 AM
 -- Server version: 5.5.24-log
 -- PHP Version: 5.3.13
 
@@ -30,9 +30,30 @@ CREATE TABLE IF NOT EXISTS `comments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `body` text NOT NULL,
-  `created_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `genders`
+--
+
+CREATE TABLE IF NOT EXISTS `genders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `genders`
+--
+
+INSERT INTO `genders` (`id`, `name`) VALUES
+(1, 'Male'),
+(2, 'Female'),
+(3, 'None');
 
 -- --------------------------------------------------------
 
@@ -71,26 +92,24 @@ CREATE TABLE IF NOT EXISTS `users` (
   `password` varchar(255) NOT NULL,
   `last_login` varchar(255) NOT NULL,
   `login_hash` varchar(255) NOT NULL,
-  `created_at` int(11) NOT NULL,
   `gender` tinyint(1) NOT NULL DEFAULT '0',
-  `auth_code` varchar(255) DEFAULT NULL,
-  `actived` tinyint(1) NOT NULL DEFAULT '0',
   `icon` varchar(255) DEFAULT NULL,
-  `hobbies` varchar(255) DEFAULT NULL,
   `view_icon` tinyint(1) NOT NULL DEFAULT '1',
   `cronmail` tinyint(1) NOT NULL DEFAULT '1',
+  `hobbies` varchar(255) DEFAULT NULL,
+  `auth_code` varchar(255) DEFAULT NULL,
+  `password_code` varchar(255) DEFAULT NULL,
+  `actived` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` int(11) NOT NULL,
   `modified_at` int(11) DEFAULT NULL,
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=19 ;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `group`, `username`, `email`, `password`, `last_login`, `login_hash`, `created_at`, `gender`, `auth_code`, `actived`, `icon`, `hobbies`, `view_icon`, `cronmail`, `modified_at`, `deleted`) VALUES
-(18, 2, 'asdasdasdas', 'pldangkhoa1088@gmail.com', 'veMcV4Tlmr03xXqgMRqo7pNeO0+xHpQXT64AKKSwR0k=', '1394788567', 'c4a222357d877015f413e79af094b4a215bf20e6', 1394780695, 1, NULL, 1, '18.jpg', '["1,2,3"]', 1, 1, NULL, 0);
+  UNIQUE KEY `email` (`email`),
+  KEY `id` (`id`),
+  KEY `email_2` (`email`),
+  KEY `auth_code` (`auth_code`),
+  KEY `password_code` (`password_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

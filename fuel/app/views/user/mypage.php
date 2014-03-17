@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-xs-12">
-		<dl class="dl-horizontal">
+		<dl class="dl-horizontal info">
 			<dt>name:</dt>
 			<dd><?php echo $username; ?></dd>
 			<dt>email:</dt>
@@ -8,11 +8,11 @@
 			<dt>gender:</dt>
 			<dd><?php echo $gender; ?></dd>
 			<dt>hobby:</dt>
-			<dd><?php echo $hobbies; ?></dd>
+			<dd><?php echo !empty($hobbies) ? $hobbies : ''; ?></dd>
 			<dt>icon:</dt>
 			<dd>
 			<?php if (!empty($icon)) : ?>
-				<img alt="icon" width="50px" height="50px" src="/files/<?php echo $icon; ?>">
+				<img alt="icon" class="icon-small" src="<?php echo _ICON_PATH_.$icon; ?>">
 			<?php endif; ?>
 			</dd>
 		</dl>

@@ -1,5 +1,5 @@
 <?php if (!empty($success)) : ?>
-	<p>Your password has been updated successfully !!!</p>
+	<p class="text-center"><strong>Your password has been updated successfully !!!</strong></p>
 <?php else : ?>
 <div class="row">
 	<div class="col-xs-12">

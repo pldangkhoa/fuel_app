@@ -89,10 +89,10 @@ return array(
 		 * SMTP settings
 		 */
 		'smtp'	=> array(
-			'host'		=> 'ssl://smtp.gmail.com',
-			'port'		=> 465,
-			'username'	=> 'zuridk@gmail.com',
-			'password'	=> 'dk@123456',
+			'host'		=> _SMTP_HOST_,
+			'port'		=> _SMTP_PORT_,
+			'username'	=> _SMTP_USER_,
+			'password'	=> _SMTP_PASS_,
 			'timeout'	=> 5,
 		),
 

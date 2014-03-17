@@ -1,6 +1,6 @@
 <?php
-
 use \Model\users;
+use \Model\genders;
 use \Model\hobbies;
 
 class Controller_User extends Controller_Mycontroller
@@ -9,15 +9,12 @@ class Controller_User extends Controller_Mycontroller
 	public $template = 'user/layout';
 	protected $user_id;
 	protected $user_info = array();
-	protected $segments = array();
 
 	public function __construct()
 	{
 		if (!Auth::check()) {
 			Response::redirect('/auth/login');
 		}
-		
-		$this->segments = Uri::segments();
 		
 		$auth_id = Auth::get_user_id();
 		$this->user_id = $auth_id[1];
@@ -32,19 +29,16 @@ class Controller_User extends Controller_Mycontroller
 	public function action_mypage()
 	{
 		$data = array();
-		$data['controller'] = $this->segments[0];
-		$data['action'] = $this->segments[1];
+		$action = \Request::active()->action;
 		
-		$hobby_ids = json_decode($this->user_info['hobbies']);
-		$hobbies = Hobbies::getHobbiesByIds($hobby_ids);
-	//	$hobbies = implode(', ', $hobbies);
+		$this->user_info['gender'] = Genders::find_by_pk($this->user_info['gender'])->name;
 		
-	//	$hobbies = explode(',', $string)
+		if (!empty($this->user_info['hobbies'])) {
+			$this->user_info['hobbies'] = implode(', ', Hobbies::getHobbiesByIds($this->user_info['hobbies']));
+		}
 		
-	//	var_dump($hobby_ids);
-		
-		
-		$data['user_info'] = $this->user_info;
+		$user_info = $this->user_info;
+		$data = compact('action', 'user_info');
 		
 		$this->template->title = 'mypage';
 		$this->template->data = $data;
@@ -54,80 +48,64 @@ class Controller_User extends Controller_Mycontroller
 	public function action_user_info_edit()
 	{
 		$data = array();
-		$data['controller'] = $this->segments[0];
-		$data['action'] = $this->segments[1];
+		$user = array();
+		$data['action'] = \Request::active()->action;
 		$data['user_info'] = $this->user_info;
+		$data['genders'] = Genders::getAllGenders();
+		$data['hobbies'] = Hobbies::getAllHobbies();
 		
 		if (Input::method() == 'POST') {
 			$val = Validation::forge();
 			$val->add_field('username', 'Username', 'trim|required|min_length[6]');
 			$val->add_field('gender', 'Gender', 'required');
+			$val->add_field('view_icon', 'View icon', 'valid_string[numeric]');
 			$val->add_field('cronmail', 'Cronmail', 'required');
-			$val->add_field('hobby', 'Hobby', 'required');
+			$val->add('hobby', 'Hobby');
 			
-			if ($val -> run()) {
+			if ($val->run()) {
 				
-				$config = array(
-					'path' => DOCROOT.'files',
-					'randomize' => true,
-					'ext_whitelist' => array('img', 'jpg', 'jpeg', 'gif', 'png'),
-					'max_size'    => 1024000,
-					'auto_rename' => false,
-					'overwrite'   => true
-				);
+				$post = $val->validated();
+				$user['username'] = trim($post['username']);
+				$user['gender'] = in_array($post['gender'], array(1, 2)) ? $post['gender'] : 3;
+				$user['view_icon'] = empty($post['view_icon']) ? 1 : 0;
+				$user['cronmail'] = empty($post['cronmail']) ? 0 : 1;
+				$user['modified_at'] = \Date::forge()->get_timestamp();
+				if (isset($post['hobby']) && is_array($post['hobby'])) {
+					$user['hobbies'] = json_encode($post['hobby']);
+				} else {
+					$user['hobbies'] = null;
+				}
 				
-				Upload::process($config);
-				
+				Upload::process();
 				if (Upload::is_valid()) {
 					Upload::save();
 					$icon_data = Upload::get_files();
-				}
-				
-				$post = Input::post();
-				$data['username'] = $post['username'];
-				$data['gender'] = $post['gender'];
-				$data['cronmail'] = $post['cronmail'];
-				if (isset($icon_data)) {
-					$data['icon'] = $this->user_id . '.' . $icon_data[0]['extension'];
-					rename(DOCROOT.'files/'.$icon_data[0]['saved_as'], DOCROOT.'files/'.$data['icon']);
-				}
-				
-				if (isset($post['hobby'])) {
-					$data['hobbies'] = json_encode($post['hobby']);
-				}
-				
-				var_dump($data);
-				
-				try {
-					Users::editUser($this->user_id, $data);
 					
-					
-				} catch (Exception $e) {
-					var_dump("error");
+					if ($icon_data) {
+						$user['icon'] = $this->user_id.'_'.$icon_data[0]['saved_as'];
+						rename(DOCROOT.'files/'.$icon_data[0]['saved_as'], DOCROOT.'files/'.$user['icon']);
+					}
+				}
+				
+				if (Users::editUser($this->user_id, $user)) {
+					$data['user_info'] = Users::getUserById($this->user_id);
+				} else {
+					$data['error'] = 'Updated error.';
 				}
 			} else {
-				//show error
+				$data['error'] = $val->error_message();
 			}
-				
-		} else {
-			//$form->validation()->error();
-			//$this->template->error = 101;
-		}	
-		
-		
-		$data['user_info'] = $this->user_info;
+		}
 		
 		$this->template->title = 'user_info_edit';
 		$this->template->data = $data;
 		$this->template->content = View::forge('user/user_info_edit', $data);
 	}
-	
-	
+
 	public function action_signout()
 	{	
 		$data = array();
-		$data['controller'] = $this->segments[0];
-		$data['action'] = $this->segments[1];
+		$data['action'] = \Request::active()->action;
 		$data['user_info'] = $this->user_info;
 		
 		if (Input::method() == 'POST') {
@@ -136,11 +114,10 @@ class Controller_User extends Controller_Mycontroller
 				Auth::logout();
 				
 				// send mail
-				$from = 'khoa@gmail.com';
 				$to = $this->user_info['email'];
 				$subject = 'Fuel app - Signout';
 				$body = $data['user_info'];
-				$this->sendmail($from, $to, $subject, $body, $view = 'signout');
+				$this->sendmail($to, $subject, $body, $view = 'signout');
 				
 				Response::redirect('/auth/login');
 			}
@@ -154,17 +131,20 @@ class Controller_User extends Controller_Mycontroller
 	public function action_email_edit()
 	{
 		$data = array();
-		$data['controller'] = $this->segments[0];
-		$data['action'] = $this->segments[1];
+		$data['action'] = \Request::active()->action;
 		$data['user_info'] = $this->user_info;
 		$data['success'] = false;
 		
 		if (Input::method() == 'POST') {
+			if (\Input::post('check_password') == 1) {
+				$data['check_password'] = 1;
+			}
+			
 			$val = Validation::forge();
 			$val->add_field('new_email', 'New Email', 'trim|required|valid_email');
 			$val->add_field('confirm_new_email', 'Confirm New Email', 'trim|match_field[new_email]');
 			
-			if ($val -> run()) {
+			if ($val->run()) {
 				$new_email = (string) trim($val->validated('new_email'));
 				
 				$user = Users::find_one_by('email', $new_email);
@@ -173,21 +153,19 @@ class Controller_User extends Controller_Mycontroller
 				} else {
 					if (Users::updateEmail($this->user_id, $new_email)) {
 						// send mail
-						$from = 'khoa@gmail.com';
-						$to = $new_email;
+						$to = array($new_email, $this->user_info['email']);
 						$subject = 'Fuel app - Email edit';
 						$body = $data['user_info'];
-						$this->sendmail($from, $to, $subject, $body, $view = 'email_edit');
+						$this->sendmail($to, $subject, $body, $view = 'email_edit');
 						
 						$data['success'] = 'Your email has been changed.';
 					} else {
 						$data['error']['success'] = 'Update email error.';
 					}
 				}	
-					
 			} else {
 				$data['error'] = $val->error_message();
-			}	
+			}
 		}
 		
 		$this->template->title = 'email edit';
@@ -198,8 +176,7 @@ class Controller_User extends Controller_Mycontroller
 	public function action_password_edit()
 	{
 		$data = array();
-		$data['controller'] = $this->segments[0];
-		$data['action'] = $this->segments[1];
+		$data['action'] = \Request::active()->action;
 		$data['user_info'] = $this->user_info;
 		$data['success'] = false;
 		
@@ -223,11 +200,10 @@ class Controller_User extends Controller_Mycontroller
 					}
 					
 					// send mail
-					$from = 'khoa@gmail.com';
 					$to = $this->user_info['email'];
 					$subject = 'Fuel app - Password edit';
 					$body = $data['user_info'];
-					$this->sendmail($from, $to, $subject, $body, $view = 'password_edit');
+					$this->sendmail($to, $subject, $body, $view = 'password_edit');
 					
 				} else {
 					$data['error']['old_password'] = 'Your old password is not correct.';
@@ -242,4 +218,27 @@ class Controller_User extends Controller_Mycontroller
 		$this->template->content = View::forge('user/password_edit', $data);
 	}
 	
+	public function action_check_password() {
+		$data = array();
+		$data['success'] = false;
+		
+		if (Input::method() == 'POST') {
+			$val = Validation::forge();
+			$val->add_field('password', 'Password', 'trim|required|min_length[6]');
+			
+			if ($val -> run()) {
+				$password = $this->hash_password(trim($val->validated('password')));
+				if (Users::find_by(array('id' => $this->user_id, 'password' => $password))) {
+					$data['success'] = true;
+				} else {
+					$data['success'] = false;
+					$data['error']['password'] = 'Password is not correct.';
+				}
+			} else {
+				$data['error'] = $val->error_message();
+			}
+		}
+		
+		return json_encode($data);
+	}
 }

@@ -1,6 +1,6 @@
 <?php
-
 use \Model\users;
+use \Model\genders;
 
 class Controller_Auth extends Controller_Mycontroller
 {
@@ -11,12 +11,34 @@ class Controller_Auth extends Controller_Mycontroller
 
 	public function action_login()
 	{
-		$this->template->title = 'login';
 		$data = array();
 		$data['app_name'] = $this->app_name;
+		$data['loginUrl'] = $this->getFbLoginUrl();
 		
 		if (\Auth::check()) {
 			\Response::redirect('/');
+		}
+		
+		//check facebook
+		$get = Input::get();
+		if ( !empty($get['code']) && !empty($get['state'])) {
+			$user_profile = $this->getFbUser();
+			if ( !empty($user_profile) ) {
+				$data['username'] = $user_profile['username'];
+				$data['email'] = $user_profile['email'];
+				$id_gender = Genders::getIdByName(ucfirst($user_profile['gender']));
+				$data['gender'] = !empty($id_gender) ? $id_gender[0]['id'] : 3;
+				
+				// check email
+				$user = Users::find_one_by('email', $data['email']);
+				if ($user) {
+					if ( ! \Auth::force_login($user->id)) {
+						$data['error']['login_fail'] = 'Your account has not actived.';
+					}
+				} else {
+					\Response::redirect('/auth/signup'.'?username='.$data['username'].'&email='.$data['email'].'&gender='.$data['gender']);
+				}
+			}
 		}
 		
 		if (\Input::method() == 'POST') {
@@ -43,6 +65,7 @@ class Controller_Auth extends Controller_Mycontroller
 			}
 		}
 		
+		$this->template->title = 'login';
 		$this->template->content = \View::forge('auth/login', $data);
 	}
 
@@ -55,9 +78,33 @@ class Controller_Auth extends Controller_Mycontroller
 
 	public function action_signup()
 	{
-		$this->template->title = 'signup';
 		$data = array();
 		$data['app_name'] = $this->app_name;
+		$data['genders'] = Genders::getAllGenders();
+		$data['loginUrl'] = $this->getFbLoginUrl();
+		
+		$get = \Input::get();
+		if (!empty($get)) {
+			$data['user'] = array(
+				'username' => !empty($get['username']) ? $get['username'] : null,
+				'email' => !empty($get['email']) ? $get['email'] : null,
+				'gender' => !empty($get['gender']) ? $get['gender'] : null,
+			);
+		}
+		
+		//check facebook
+		if ( !empty($get['code']) && !empty($get['state'])) {
+			$user_profile = $this->getFbUser();
+			if ( !empty($user_profile) ) {
+				$id_gender = Genders::getIdByName(ucfirst($user_profile['gender']));
+				$gender = !empty($id_gender) ? $id_gender[0]['id'] : 3;
+				$data['user'] = array(
+					'username' => $user_profile['username'],
+					'email' => $user_profile['email'],
+					'gender' => $gender,
+				);
+			}
+		}
 		
 		if (\Input::method() == 'POST') {
 			$val = \Validation::forge();
@@ -68,36 +115,39 @@ class Controller_Auth extends Controller_Mycontroller
 			$val->add_field('gender', 'Gender', 'required');
 			
 			if ($val->run()) {
+				$post = $val->validated();
+				
 				$user = array(
-					'username'	=> (string) trim($val->validated('username')),
-					'password'	=> $this->hash_password((string) trim($val->validated('password'))),
-					'email'		=> strtolower(trim($val->validated('email'))),
-					'gender'	=> (int)($val->validated('gender')),
-					'auth_code'	=> $this->genCode(trim($val->validated('username')))
+					'username'	=> (string) trim($post['username']),
+					'password'	=> $this->hash_password((string) trim($post['password'])),
+					'email'		=> strtolower(trim($post['email'])),
+					'gender'	=> in_array($post['gender'], array(1, 2)) ? $post['gender'] : 3,
+					'auth_code'	=> $this->genCode(trim($post['email']))
 				);
 				
-				if (Users::checkInValidEmail($user['email'])) {
-					// insert user
+				if (Users::find_one_by('email',$user['email'])) {
+					$data['error']['email'] = 'Your email is invalid.';
+				} else {
 					if (Users::insertUser($user)) {
 						// send mail
-						$from = 'khoa@gmail.com';
 						$to = $user['email'];
 						$subject = 'Fuel app - Signup';
 						$body = $user;
-						$this->sendmail($from, $to, $subject, $body, $view = 'signup');
+						$this->sendmail($to, $subject, $body, $view = 'signup');
 						
 						\Response::redirect('/auth/thank_you_signup');
 					} else {
 						$data['error']['signup_fail'] = 'Sign up error.';
 					}
-				} else {
-					$data['error']['signup_fail'] = 'Your email is invalid.';
 				}
 			} else {
 				$data['error'] = $val->error_message();
 			}
+			
+			$data['user'] = $val->validated();
 		}
 		
+		$this->template->title = 'signup';
 		$this->template->content = \View::forge('auth/signup', $data);
 	}
 
@@ -110,9 +160,7 @@ class Controller_Auth extends Controller_Mycontroller
 	public function action_activation_complete()
 	{
 		$data = array();
-		
-		$segments = Uri::segments();
-		$auth_code = !empty($segments[2]) ? $segments[2] : null;
+		$auth_code = !empty(\Request::active()->method_params[0]) ? \Request::active()->method_params[0] : null;
 		
 		$user = Users::find_one_by('auth_code', $auth_code);
 		if ($user) {
@@ -139,17 +187,15 @@ class Controller_Auth extends Controller_Mycontroller
 				$email = trim($val->validated('email'));
 				$user = Users::find_one_by('email', $email);
 				if ($user) {
-					$data['auth_code'] = $this->genCode($email);
-					
-					$user->auth_code = $data['auth_code'];
+					$data['password_code'] = $this->genCode($email);
+					$user->password_code = $data['password_code'];
 					$user->save();
 					
 					// send mail
-					$from = 'khoa@gmail.com';
 					$to = $email;
 					$subject = 'Fuel app - Forget password';
 					$body = $data;
-					$this->sendmail($from, $to, $subject, $body, $view = 'forget_password');
+					$this->sendmail($to, $subject, $body, $view = 'forget_password');
 					
 					$data['error']['success'] = 'We sent you an email.';
 					
@@ -168,10 +214,9 @@ class Controller_Auth extends Controller_Mycontroller
 	public function action_new_password()
 	{
 		$data = array();
-		$segments = Uri::segments();
-		$data['auth_code'] = !empty($segments[2]) ? $segments[2] : null;
+		$data['password_code'] = !empty(\Request::active()->method_params[0]) ? \Request::active()->method_params[0] : null;
 		
-		$user = Users::find_one_by('auth_code', $data['auth_code']);
+		$user = Users::find_one_by('password_code', $data['password_code']);
 		if ($user) {
 			if (\Input::method() == 'POST') {
 				$val = Validation::forge();
@@ -181,27 +226,20 @@ class Controller_Auth extends Controller_Mycontroller
 				if ($val->run()) {
 					$password = $this->hash_password(trim($val->validated('new_password')));
 					
-					$user->auth_code = null;
+					$user->password_code = null;
 					$user->password = $password;
 					$user->save();
 					
-					\Response::redirect('/auth/change_password_success');
-					
+					$data['error']['success'] = 'Your password has been changed.';
 				} else {
 					$data['error'] = $val->error_message();
 				}
 			}
 		} else {
-			$data['error']['auth_code'] = 'Auth code is not correct.';
+			$data['error']['password_code'] = 'Auth code is not correct.';
 		}
 		
 		$this->template->title = 'new password';
 		$this->template->content = View::forge('auth/new_password', $data);
-	}
-	
-	public function action_change_password_success()
-	{
-		$this->template->title = 'change_password_success';
-		$this->template->content = View::forge('auth/change_password_success');
 	}
 }

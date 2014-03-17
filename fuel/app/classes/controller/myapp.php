@@ -16,11 +16,16 @@ use \Model\users;
 class Controller_Myapp extends Controller_Mycontroller
 {
 
+	protected $user_id;
+
 	public function __construct()
 	{
 		if (!Auth::check()) {
 			Response::redirect('/auth/login');
 		}
+		
+		$auth_id = Auth::get_user_id();
+		$this->user_id = $auth_id[1];
 	}
 
 	public function action_index()
@@ -28,59 +33,76 @@ class Controller_Myapp extends Controller_Mycontroller
 		$data = array();
 		
 		$data['app_name'] = $this->app_name;
-		$user_id = Auth::get_user_id();
 		
 		//get user info
-		$data['user_info'] = Users::getUserById($user_id[1]);
+		$data['user_info'] = Users::getUserById($this->user_id);
 		
+		$data['comments'] = Comments::getComments();
+		if (!empty($data['comments'])) {
+			$end_comment = end($data['comments']);
+			$data['offset'] = $end_comment['id'];
+		}
 		
-		$data['comments'] = Comments::getCommentsByOffset();
-		$data['offset'] = count($data['comments']);
+		$data['num'] = !empty($data['comments']) ? count($data['comments']) : 0;
+		$data['total'] = Comments::countAllComments();
 		
 		$this->template->title = 'myapp';
 		$this->template->content = View::forge('myapp/index', $data);
 	}
-	
+
 	public function action_addComment()
 	{
 		$data = array();
-		
-		$user_id = Auth::get_user_id();
 		
 		if (Input::method() == 'POST') {
 			$val = Validation::forge();
 			$val->add_field('comment', 'Comment', 'trim|required');
 			
 			if ($val -> run()) {
-				Comments::addComment($user_id[1], Input::post('comment'));
+				Comments::addComment($this->user_id, trim($val->validated('comment')));
 			} else {
-				//$form->validation()->error();
+				$data['error'] = $val->error_message();
 			}
 		}
 		
-		$data['comments'] = Comments::getCommentsByOffset();
-		$data['offset'] = count($data['comments']);
+		$data['comments'] = Comments::getComments();
+		if (!empty($data['comments'])) {
+			$end_comment = end($data['comments']);
+			$data['offset'] = $end_comment['id'];
+		}
+		
+		$data['num'] = !empty($data['comments']) ? count($data['comments']) : 0;
+		$data['total'] = Comments::countAllComments();
 		
 		return new Response(View::forge('myapp/comment', $data));
 	}
-	
+
 	public function action_loadComment()
 	{
 		$data = array();
+		$total_record = null;
 		
 		if (Input::method() == 'POST') {
 			$val = Validation::forge();
-			$val->add_field('offset', 'Offset', 'trim|required');
+			$val->add_field('offset', 'Offset', 'required');
+			$val->add_field('total_record', 'Total record', 'required');
 			
-			if ($val -> run()) {
-				$data['comments'] = Comments::getCommentsByOffset(5, Input::post('offset'));
-				$data['offset'] = count($data['comments']) + Input::post('offset');
+			if ($val->run()) {
+				$data['comments'] = Comments::getComments((int) $val->validated('offset'));
+				if (!empty($data['comments'])) {
+					$end_comment = end($data['comments']);
+					$data['offset'] = $end_comment['id'];
+					$total_record = count($data['comments']);
+				}
+				
+				$total_record += (int) $val->validated('total_record');
 			} else {
-				//$form->validation()->error();
+				$data['error'] = $val->error_message();
 			}
 		}
 		
-	//	$data['comments'] = Comments::getCommentsByOffset(10, Input::post('offset'));
+		$data['num'] = !empty($total_record) ? $total_record : 0;
+		$data['total'] = Comments::countAllComments();
 		
 		return new Response(View::forge('myapp/comment', $data));
 	}

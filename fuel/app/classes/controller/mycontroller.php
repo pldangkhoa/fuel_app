@@ -10,15 +10,48 @@
  * @link       http://fuelphp.com
  */
 
+require_once COREPATH . '../app/classes/facebook/facebook.php';
+
 class Controller_Mycontroller extends Controller_Template
 {
 	protected $app_name = 'Fuel Auth App';
 	private $hasher = null;
+	protected $fb_instance;
+	protected $fb_user;
 	
 	function __construct() {
 		Auth::_init();
+		$this->init_fb();
 	}
-	
+
+	public function init_fb()
+	{
+		$this->fb_instance = new Facebook(array(
+			'appId'  => _FB_APP_ID_,
+			'secret' => _FB_SECRET_,
+		));
+		
+		$this->fb_user = $this->fb_instance->getUser();
+	}
+
+	public function getFbUser()
+	{
+		if ( ! empty($this->fb_user)) {
+			try {
+				return $this->fb_instance->api('/me');
+			} catch (Exception $e) {
+				return false;
+			}	
+		}
+		
+		return false;
+	}
+
+	public function getFbLoginUrl()
+	{
+		return $this->fb_instance->getLoginUrl(array( 'scope' => 'email, read_stream, publish_stream, user_birthday, user_location, user_work_history, user_hometown, user_photos'));
+	}
+
 	/**
 	 * Default password hash method
 	 *
@@ -50,10 +83,10 @@ class Controller_Mycontroller extends Controller_Template
 		}
 	}
 	
-	public function sendmail($from, $to, $subject, $body, $view = null)
+	public function sendmail($to, $subject, $body, $view = null)
 	{
 		$email = Email::forge();
-		$email->from($from);
+		$email->from(_MAIL_FROM_);
 		$email->to($to);
 		$email->subject($subject);
 		

@@ -8,7 +8,11 @@
 	<fieldset class="col-sm-offset-2 col-xs-8 box">
 		<legend>sign up</legend>
 		<div class="row fb-box">
-			<div class="col-sm-offset-1 col-xs-10"><button class="btn btn-primary col-xs-12">Facebook on Signup</button></div>
+			<div class="col-sm-offset-1 col-xs-10">
+				<a href="<?php echo !empty($loginUrl) ? $loginUrl : ''; ?>">
+					<button class="btn btn-primary col-xs-12"><?php ?>Facebook on Signup</button>
+				</a>
+			</div>
 		</div>
 		<div class="row login-box">
 			<div class="col-xs-12">
@@ -21,14 +25,14 @@
 					<div class="form-group">
 						<label for="inputUsername" class="col-xs-4 control-label">username: </label>
 						<div class="col-xs-7">
-							<input type="text" name="username" class="form-control" id="inputUsername" placeholder="username">
+							<input type="text" name="username" class="form-control" id="inputUsername" placeholder="username" value="<?php echo !empty($user['username']) ? $user['username'] : ''; ?>">
 							<span class="error"><?php echo !empty($error['username']) ? $error['username'] : ''; ?></span>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="inputEmail" class="col-xs-4 control-label">Email: </label>
 						<div class="col-xs-7">
-							<input type="email" name="email" class="form-control" id="inputEmail" placeholder="your email">
+							<input type="email" name="email" class="form-control" id="inputEmail" placeholder="your email" value="<?php echo !empty($user['email']) ? $user['email'] : ''; ?>">
 							<span class="error"><?php echo !empty($error['email']) ? $error['email'] : ''; ?></span>
 						</div>
 					</div>
@@ -49,21 +53,15 @@
 					<div class="form-group">
 						<label for="inputGender" class="col-xs-4 control-label">gender: </label>
 						<div class="col-xs-8">
-							<div class="checkbox-inline">
-								<label>
-									<input type="radio" name="gender" id="gender1" value="1" checked> male
-								</label>
-							</div>
-							<div class="checkbox-inline">
-								<label>
-									<input type="radio" name="gender" id="gender2" value="2"> female
-								</label>
-							</div>
-							<div class="checkbox-inline">
-								<label>
-									<input type="radio" name="gender" id="gender3" value="0"> none
-								</label>
-							</div>
+							<?php if (!empty($genders)) : ?>
+								<?php foreach ($genders as $gender) : ?>
+									<div class="checkbox-inline">
+										<label>
+											<input type="radio" name="gender" id="gender<?php echo $gender['id']; ?>" value="<?php echo $gender['id']; ?>" <?php echo (!empty($user['gender']) && $user['gender'] == $gender['id']) ? 'checked' : ''; ?>> <?php echo $gender['name']; ?>
+										</label>
+									</div>
+								<?php endforeach; ?>
+							<?php endif; ?>
 						</div>
 					</div>
 					<div class="form-group">
@@ -75,4 +73,10 @@
 			</div>
 		</div>
 	</fieldset>
+	
+	<script type="text/javascript">
+		<?php if (empty($user['gender'])) : ?>
+			$( "#gender1" ).prop( "checked", true );
+		<?php endif; ?>
+	</script>
 </div>

@@ -6,10 +6,14 @@
 </div>
 <div class="row">
 	<div class="col-sm-offset-2 col-xs-8">
-		<?php if (empty($error['auth_code'])) : ?>
+		<?php if (!empty($error['success'])) : ?>
+			<p class="error"><?php echo $error['success']; ?></p>
+		<?php elseif (!empty($error['password_code'])) : ?>
+			<p class="error"><?php echo $error['password_code']; ?></p>
+		<?php else: ?>
 		<div class="row">
 			<div class="col-xs-12">
-				<form class="form-horizontal" role="form" action="<?php echo Uri::create('auth/new_password/'.$auth_code, array(), array()); ?>" method="post">
+				<form class="form-horizontal" role="form" action="<?php echo Uri::create('auth/new_password/'.$password_code, array(), array()); ?>" method="post">
 					<div class="form-group">
 						<label for="inputNewPassword" class="col-xs-4 control-label">password: </label>
 						<div class="col-xs-7">
@@ -32,8 +36,6 @@
 				</form>
 			</div>
 		</div>
-		<?php else : ?>
-		<p class="error"><?php echo $error['auth_code']; ?></p>
 		<?php endif; ?>
 	</div>	
 </div>

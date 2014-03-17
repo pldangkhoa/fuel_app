@@ -184,6 +184,7 @@ class Auth_Login_Simpleauth extends \Auth_Login_Driver
 		$this->user = \DB::select_array(\Config::get('simpleauth.table_columns', array('*')))
 			->where_open()
 			->where('id', '=', $user_id)
+			->and_where('actived', '=', '1')
 			->where_close()
 			->from(\Config::get('simpleauth.table_name'))
 			->execute(\Config::get('simpleauth.db_connection'))
@@ -197,7 +198,7 @@ class Auth_Login_Simpleauth extends \Auth_Login_Driver
 			return false;
 		}
 
-		\Session::set('username', $this->user['username']);
+		\Session::set('username', $this->user['email']);
 		\Session::set('login_hash', $this->create_login_hash());
 		return true;
 	}

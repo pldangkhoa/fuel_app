@@ -45,7 +45,7 @@ class Users extends \Model_Crud
 	{
 		if ($user_id && $data) {
 			try {
-				DB::update(static::$_table_name)->set($data)->where('id', $user_id)->execute();
+				return DB::update(static::$_table_name)->set($data)->where('id', $user_id)->execute();
 			} catch (Exception $e) {
 				return false;
 			}
@@ -59,6 +59,7 @@ class Users extends \Model_Crud
 			$result = DB::select('*')->from(static::$_table_name)->where('id', $user_id)->execute()->as_array();
 			
 			if ($result) {
+				$result[0]['hobbies'] = json_decode($result[0]['hobbies']);
 				return $result[0];
 			}
 		}
@@ -85,10 +86,10 @@ class Users extends \Model_Crud
 	public static function checkPassword($user_id = null, $password = null)
 	{
 		if ($user_id && $password) {
-			$result = DB::select('id')->from(static::$_table_name)->where('id', $user_id)->and_where('password', $password)->execute();
-			
-			if ($result) {
-				return true;
+			try {
+				return DB::select('id')->from(static::$_table_name)->where('id', $user_id)->and_where('password', $password)->execute();
+			} catch (Exception $e) {
+				return false;
 			}
 		}
 		
@@ -111,21 +112,28 @@ class Users extends \Model_Crud
 	public static function checkEmail($user_id = null, $email = null)
 	{
 		if ($user_id && $email) {
-			$result = DB::select('id')->from(static::$_table_name)->where('id', $user_id)->and_where('email', $email)->execute();
-			
-			if ($result) {
-				return true;
+			try {
+				return DB::select('id')->from(static::$_table_name)->where('id', $user_id)->and_where('email', $email)->execute();
+			} catch (Exception $e) {
+				return false;
 			}
 		}
 		
 		return false;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
+	public static function getUserCronmail()
+	{
+		$result = DB::select('*')->from(static::$_table_name)->where('id', $user_id)->execute()->as_array();
+		
+		if ($result) {
+			foreach ($result as $key => $value) {
+				$result[$key]['hobbies'] = json_decode($value['hobbies']);
+			}
+			
+			return $result;
+		}
+		
+		return false;
+	}
 }
