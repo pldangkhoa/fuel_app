@@ -10,7 +10,7 @@ class Controller_User extends Controller_Mycontroller
 	protected $user_id;
 	protected $user_info = array();
 
-	public function __construct()
+	function __construct()
 	{
 		if (!Auth::check()) {
 			Response::redirect('/auth/login');

@@ -22,7 +22,6 @@ class Controller_Mycontroller extends Controller_Template
 	function __construct() {
 		Auth::_init();
 		$this->init_fb();
-		View::set_global('base_url',  'http://'.$_SERVER['HTTP_HOST']);
 	}
 
 	public function init_fb()

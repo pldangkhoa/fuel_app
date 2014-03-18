@@ -81,6 +81,7 @@ class Controller_Auth extends Controller_Mycontroller
 	public function action_signup()
 	{
 		$data = array();
+		$data['base_url'] = 'http://'.$_SERVER['HTTP_HOST'];
 		$data['app_name'] = $this->app_name;
 		$data['genders'] = Genders::getAllGenders();
 		$data['loginUrl'] = $this->getFbLoginUrl();
@@ -180,6 +181,7 @@ class Controller_Auth extends Controller_Mycontroller
 	public function action_forget_password()
 	{
 		$data = array();
+		$data['base_url'] = 'http://'.$_SERVER['HTTP_HOST'];
 		
 		if (\Input::method() == 'POST') {
 			$val = \Validation::forge();
