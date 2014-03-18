@@ -6,7 +6,7 @@
 			<dt>email:</dt>
 			<dd><?php echo $email; ?></dd>
 			<dt>gender:</dt>
-			<dd><?php echo $gender; ?></dd>
+			<dd><?php echo strtolower($gender); ?></dd>
 			<dt>hobby:</dt>
 			<dd><?php echo !empty($hobbies) ? $hobbies : ''; ?></dd>
 			<dt>icon:</dt>

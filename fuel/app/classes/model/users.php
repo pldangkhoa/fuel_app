@@ -124,7 +124,7 @@ class Users extends \Model_Crud
 
 	public static function getUserCronmail()
 	{
-		$result = DB::select('*')->from(static::$_table_name)->where('id', $user_id)->execute()->as_array();
+		$result = DB::select('*')->from(static::$_table_name)->where('cronmail', "1")->execute()->as_array();
 		
 		if ($result) {
 			foreach ($result as $key => $value) {

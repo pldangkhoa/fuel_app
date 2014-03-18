@@ -57,7 +57,7 @@
 								<?php foreach ($genders as $gender) : ?>
 									<div class="checkbox-inline">
 										<label>
-											<input type="radio" name="gender" id="gender<?php echo $gender['id']; ?>" value="<?php echo $gender['id']; ?>" <?php echo (!empty($user['gender']) && $user['gender'] == $gender['id']) ? 'checked' : ''; ?>> <?php echo $gender['name']; ?>
+											<input type="radio" name="gender" id="gender<?php echo $gender['id']; ?>" value="<?php echo $gender['id']; ?>" <?php echo (!empty($user['gender']) && $user['gender'] == $gender['id']) ? 'checked' : ''; ?>> <?php echo strtolower($gender['name']); ?>
 										</label>
 									</div>
 								<?php endforeach; ?>

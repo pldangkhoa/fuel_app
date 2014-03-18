@@ -145,7 +145,7 @@ class Controller_User extends Controller_Mycontroller
 			$val->add_field('confirm_new_email', 'Confirm New Email', 'trim|match_field[new_email]');
 			
 			if ($val->run()) {
-				$new_email = (string) trim($val->validated('new_email'));
+				$new_email = (string) strtolower(trim($val->validated('new_email')));
 				
 				$user = Users::find_one_by('email', $new_email);
 				if ($user) {

@@ -32,7 +32,9 @@ class Controller_Auth extends Controller_Mycontroller
 				// check email
 				$user = Users::find_one_by('email', $data['email']);
 				if ($user) {
-					if ( ! \Auth::force_login($user->id)) {
+					if (\Auth::force_login($user->id)) {
+						\Response::redirect('/');
+					} else {
 						$data['error']['login_fail'] = 'Your account has not actived.';
 					}
 				} else {

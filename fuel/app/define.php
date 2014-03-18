@@ -10,7 +10,7 @@ define('_SMTP_HOST_', 'ssl://smtp.gmail.com');
 define('_SMTP_PORT_', 465);
 define('_SMTP_USER_', 'zuridk@gmail.com');
 define('_SMTP_PASS_', 'dk@123456');
-define('_MAIL_FROM_', 'khoapld@evolableasia.vn@gmail.com');
+define('_MAIL_FROM_', 'khoapld@evolableasia.vn');
 
 //Comment Limit
 define('_COMMENT_LIMIT_', 10);

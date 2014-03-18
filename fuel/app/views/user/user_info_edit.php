@@ -14,7 +14,7 @@
 					<select class="form-control" name="gender">
 					<?php if (!empty($genders)) : ?>
 						<?php foreach ($genders as $gender) : ?>
-							<option value="<?php echo $gender['id']; ?>" <?php echo $gender['id'] == $user_info['gender'] ? 'selected' : ''; ?>><?php echo $gender['name']; ?></option>
+							<option value="<?php echo $gender['id']; ?>" <?php echo $gender['id'] == $user_info['gender'] ? 'selected' : ''; ?>><?php echo strtolower($gender['name']); ?></option>
 						<?php endforeach; ?>
 					<?php endif; ?>
 					</select>
