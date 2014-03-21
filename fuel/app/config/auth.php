@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fuel
  *
@@ -11,7 +12,6 @@
  * @copyright  2010 - 2013 Fuel Development Team
  * @link       http://fuelphp.com
  */
-
 /**
  * NOTICE:
  *
@@ -20,10 +20,9 @@
  *
  * This will allow you to upgrade fuel without losing your custom config.
  */
-
 return array(
-	'driver' => 'Simpleauth',
-	'verify_multiple_logins' => true,
-	'salt' => _AUTH_SALT_,
-	'iterations' => 10000,
+    'driver' => 'Simpleauth',
+    'verify_multiple_logins' => true,
+    'salt' => _AUTH_SALT_,
+    'iterations' => 10000,
 );
