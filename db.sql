@@ -1,13 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.1
+-- version 4.0.4
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Mar 17, 2014 at 01:11 AM
--- Server version: 5.5.24-log
--- PHP Version: 5.3.13
+-- Generation Time: Mar 21, 2014 at 06:08 AM
+-- Server version: 5.6.12-log
+-- PHP Version: 5.4.12
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 
@@ -19,6 +19,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `fuelapp`
 --
+CREATE DATABASE IF NOT EXISTS `fuelapp` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `fuelapp`;
 
 -- --------------------------------------------------------
 
@@ -64,19 +66,20 @@ INSERT INTO `genders` (`id`, `name`) VALUES
 CREATE TABLE IF NOT EXISTS `hobbies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `actived` tinyint(1) NOT NULL DEFAULT '1',
   `order` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
 
 --
 -- Dumping data for table `hobbies`
 --
 
-INSERT INTO `hobbies` (`id`, `name`, `actived`, `order`) VALUES
-(1, 'Football', 1, 1),
-(2, 'Baseball', 1, 2),
-(3, 'Tenis', 1, 3);
+INSERT INTO `hobbies` (`id`, `name`, `order`) VALUES
+(1, 'Football', 1),
+(2, 'Baseball', 2),
+(3, 'Tennis', 3),
+(4, 'Swimming', 4),
+(5, 'Sleeping', 5);
 
 -- --------------------------------------------------------
 
@@ -109,6 +112,20 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `email_2` (`email`),
   KEY `auth_code` (`auth_code`),
   KEY `password_code` (`password_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_hobby`
+--
+
+CREATE TABLE IF NOT EXISTS `user_hobby` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `hobby_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`,`hobby_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
